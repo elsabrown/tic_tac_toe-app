@@ -9,8 +9,8 @@ class Square extends React.Component {
 
   handleClick() {
     console.log("Нажали на клетку", this.props.position);
-    this.props.handleClickSquare(this.props.position);
-    // this.props.onClick(this.props.position);
+    this.props.onClick(this.props.position);
+        // this.props.handleClickSquare(this.props.position);
   }
 
   render() {
