@@ -5,10 +5,9 @@ class Game extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      squares: Array(9).fill(""),
       history: [{ squares: Array(9).fill("") }],
       nextStep: "X",
-      isFinish: false
+      isFinish: false,
     };
 
     this.calculateWinner = this.calculateWinner.bind(this);
@@ -28,7 +27,11 @@ class Game extends React.Component {
     ];
     for (let i = 0; i < lines.length; i++) {
       const [a, b, c] = lines[i];
-      if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+      if (
+        squares[a] &&
+        squares[a] === squares[b] &&
+        squares[a] === squares[c]
+      ) {
         return true;
       }
     }
@@ -36,17 +39,18 @@ class Game extends React.Component {
   }
 
   clickSquare(i) {
-    // console.log("clickSquare", i, this.state.isFinish);
-    let squaresCopy = [...this.state.squares];
+    const {history} = this.state;
+    const currentSquaresCopy = history[history.length -1].squares;
+
     let isFinish;
-    if (squaresCopy[i] === "" && !this.state.isFinish) {
-      squaresCopy[i] = this.state.nextStep;
-      isFinish = this.calculateWinner(squaresCopy);
+    if (currentSquaresCopy[i] === "" && !this.state.isFinish) {
+      currentSquaresCopy[i] = this.state.nextStep;
+      isFinish = this.calculateWinner(currentSquaresCopy);
       this.setState((state) => {
         const { history, nextStep } = state;
         return {
-          squares: squaresCopy,
-          history: history.concat(squaresCopy),
+          squares: currentSquaresCopy,
+          history: history.concat({ squares:currentSquaresCopy }),
           nextStep: isFinish ? nextStep : nextStep === "X" ? "0" : "X",
           isFinish
         };
@@ -57,15 +61,27 @@ class Game extends React.Component {
   }
 
   render() {
+    const { history, nextStep, isFinish } = this.state;
+    let status;
+
+    if (isFinish) {
+      status = "Игра закончилась Выиграли " + nextStep;
+    } else {
+      status = "Следующий ход за: " + nextStep;
+    }
+
+    const currentSquares = history[history.length -1].squares;
+
     return (
       <div className="game">
         <div className="game-board">
-          <Board 
-          squares={this.state.squares}
-          history={this.state.history}
-          nextStep={this.state.nextStep}
-          isFinish={this.state.isFinish}
-          handleClickSquare={this.clickSquare}
+          <div className="status">{status}</div>
+          <Board
+            squares={currentSquares}
+            history={history}
+            nextStep={nextStep}
+            isFinish={isFinish}
+            handleClickSquare={this.clickSquare}
           />
         </div>
         <div className="game-info">
