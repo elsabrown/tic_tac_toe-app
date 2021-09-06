@@ -6,12 +6,15 @@ class Game extends React.Component {
     super(props);
     this.state = {
       history: [{ squares: Array(9).fill("") }],
+      currentStepNumber: 0,
       nextStep: "X",
       isFinish: false,
     };
 
     this.calculateWinner = this.calculateWinner.bind(this);
     this.clickSquare = this.clickSquare.bind(this);
+    this.showButtonsHistory = this.showButtonsHistory.bind(this);
+    this.jumpTo = this.jumpTo.bind(this);
   }
 
   calculateWinner(squares) {
@@ -39,8 +42,8 @@ class Game extends React.Component {
   }
 
   clickSquare(i) {
-    const {history} = this.state;
-    const currentSquaresCopy = history[history.length -1].squares;
+    const { history } = this.state;
+    const currentSquaresCopy = history[history.length - 1].squares;
 
     let isFinish;
     if (currentSquaresCopy[i] === "" && !this.state.isFinish) {
@@ -50,18 +53,33 @@ class Game extends React.Component {
         const { history, nextStep } = state;
         return {
           squares: currentSquaresCopy,
-          history: history.concat({ squares:currentSquaresCopy }),
+          history: history.concat({ squares: currentSquaresCopy }),
           nextStep: isFinish ? nextStep : nextStep === "X" ? "0" : "X",
-          isFinish
+          currentStepNumber: history.length,
+          isFinish,
         };
       });
 
-      console.log("history", this.state.history);
-    }  
+      console.log("history", this.state.history, this.state.currentStep);
+    }
+  }
+
+  jumpTo(step) {
+   this.setState({ currentStepNumber: step })
+  }
+
+  showButtonsHistory() {
+    return this.state.history.map((step, index) => {
+      return (
+        <li>
+          <button onClick={() => this.jumpTo(index)}>Перейти на ход {index + 1}</button>
+        </li>
+      )
+    });
   }
 
   render() {
-    const { history, nextStep, isFinish } = this.state;
+    const { history, currentStepNumber, nextStep, isFinish } = this.state;
     let status;
 
     if (isFinish) {
@@ -70,7 +88,10 @@ class Game extends React.Component {
       status = "Следующий ход за: " + nextStep;
     }
 
-    const currentSquares = history[history.length -1].squares;
+    const currentSquares = history[currentStepNumber].squares;
+    const buttonsHistory = this.showButtonsHistory();
+
+    console.log("currentStepNumber", currentStepNumber, history[currentStepNumber].squares);
 
     return (
       <div className="game">
@@ -85,8 +106,7 @@ class Game extends React.Component {
           />
         </div>
         <div className="game-info">
-          <div>{/* status */}</div>
-          <ol>{/* TODO */}</ol>
+          <ul>{buttonsHistory}</ul>
         </div>
       </div>
     );
